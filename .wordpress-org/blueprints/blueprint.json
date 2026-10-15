@@ -1,6 +1,6 @@
 {
 	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
-	"landingPage": "/wp-admin/",
+	"landingPage": "/blockparty-button-icon-demo/",
 	"preferredVersions": {
 		"php": "8.1",
 		"wp": "latest"
@@ -11,8 +11,8 @@
 			"pluginData": {
 				"resource": "git:directory",
 				"url": "https://github.com/BeAPI/blockparty-button-icon",
-				"ref": "1.0.0",
-				"refType": "tag"
+				"ref": "playground/blueprint-preview",
+				"refType": "branch"
 			},
 			"options": {
 				"activate": true,
@@ -23,6 +23,10 @@
 			"step": "login",
 			"username": "admin",
 			"password": "password"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php\nrequire_once 'wordpress/wp-load.php';\nrequire_once WP_PLUGIN_DIR . '/blockparty-button-icon/.wordpress-org/blueprints/bootstrap-playground.php';\n?>"
 		}
 	]
 }
