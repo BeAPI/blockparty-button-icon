@@ -39,10 +39,10 @@
 		"stylelint-config-recess-order": "^7.8.0"
 	},
 	"engines": {
-		"node": ">=20",
-		"npm": ">=10"
+		"node": ">=24",
+		"npm": ">=11"
 	},
 	"volta": {
-		"node": "24.15.0"
+		"node": "24.22.0"
 	}
 }
