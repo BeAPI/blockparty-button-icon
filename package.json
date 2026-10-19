@@ -1,0 +1,49 @@
+{
+	"name": "blockparty-button-icon",
+	"version": "1.0.0",
+	"description": "Easily add icons to button blocks in WordPress.",
+	"author": "Be API Technical Team",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start",
+		"env:start": "wp-env start",
+		"env:stop": "wp-env stop",
+		"env": "wp-env",
+		"make-pot": "wp i18n make-pot . languages/blockparty-button-icon.pot --slug=blockparty-button-icon --domain=blockparty-button-icon --exclude=node_modules,src",
+		"make-json": "wp i18n make-json languages/ --no-purge",
+		"bump": "bash tests/bin/bump.sh"
+	},
+	"dependencies": {
+		"@wordpress/block-editor": "latest",
+		"@wordpress/blocks": "latest",
+		"@wordpress/components": "^42.0.0",
+		"@wordpress/compose": "^8.10.0",
+		"@wordpress/data": "^10.57.0",
+		"@wordpress/element": "^9.0.0",
+		"@wordpress/hooks": "^4.57.0",
+		"@wordpress/i18n": "latest",
+		"@wordpress/icons": "^18.0.0",
+		"@wordpress/keycodes": "^4.57.0",
+		"@wordpress/url": "^4.57.0",
+		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"@wordpress/env": "^11.16.0",
+		"@wordpress/scripts": "^36.1.0",
+		"stylelint-config-recess-order": "^7.8.0"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=11"
+	},
+	"volta": {
+		"node": "24.22.0"
+	}
+}
