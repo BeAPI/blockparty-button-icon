@@ -4,6 +4,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     name: "Release new TAG"
@@ -13,6 +16,10 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          fetch-tags: true
+
+      - name: Fetch tags
+        run: git fetch --tags --prune origin
 
       - id: set-vars
         name: "Set variable from .plugin-data file"
@@ -32,6 +39,11 @@ jobs:
           echo "Get Branch tag"
           if git rev-parse "$VERSION" >/dev/null 2>&1; then
             echo "Tag already exists, stop now";
+            exit 1;
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${VERSION}" >/dev/null 2>&1; then
+            echo "Remote tag already exists, stop now";
             exit 1;
           fi
 
