@@ -7,7 +7,6 @@ import {
 import EditWithIconToolbar from './edit-with-icon-toolbar';
 import { normalizeButtonLabelText } from './normalize-button-label-text';
 import buttonIconSave from './save';
-import './icon-span-in-button';
 
 const LABEL_CLASS_SELECTOR = `.${ BUTTON_LABEL_CLASS_NAME }`;
 const BUTTON_TEXT_SELECTOR = `a.wp-block-button__link:not(:has(> ${ LABEL_CLASS_SELECTOR })), button.wp-element-button:not(:has(> ${ LABEL_CLASS_SELECTOR })), ${ LABEL_CLASS_SELECTOR }`;

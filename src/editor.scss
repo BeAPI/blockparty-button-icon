@@ -23,8 +23,7 @@ $wp-block-button-icon-size: 1.25em;
             vertical-align: middle;
         }
 
-        .block-editor-block-list__block > .wp-block-icon,
-        .block-editor-block-list__block > span.wp-block-icon {
+        .block-editor-block-list__block > .wp-block-icon {
             width: $wp-block-button-icon-size;
             height: $wp-block-button-icon-size;
         }

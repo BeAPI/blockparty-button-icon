@@ -86,7 +86,8 @@ class IconBlockRenderer {
 	/**
 	 * Renders core/icon with a span wrapper when used inside button links (valid phrasing content).
 	 *
-	 * Matches the editor path: only convert when nested in a core/button with hasIcon.
+	 * Only convert when nested in a core/button with hasIcon. The editor keeps the
+	 * React-owned div wrapper; conversion is front-end only.
 	 *
 	 * @param string $block_content Rendered block HTML.
 	 * @param array  $block         Block data.
