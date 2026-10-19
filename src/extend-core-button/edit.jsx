@@ -16,7 +16,6 @@ import {
 	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalGetElementClassName,
 	getTypographyClassesAndStyles as useTypographyProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 const useBackgroundProps =
@@ -27,8 +26,6 @@ const useBackgroundProps =
 	} ) );
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
 import ButtonIconControls from './button-icon-controls';
 import { getRegisteredIconBlocks } from './get-registered-icon-blocks';
 import { getIconTemplateAttributes } from './get-icon-template-attributes';
@@ -76,36 +73,6 @@ export default function ButtonIconEdit( props ) {
 	const registeredIconBlocks = getRegisteredIconBlocks();
 	const hasIconBlock = registeredIconBlocks.length > 0;
 	const templateIconBlock = registeredIconBlocks[ 0 ];
-
-	const innerBlockCount = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( clientId ).length,
-		[ clientId ]
-	);
-
-	const { insertBlock, selectBlock } = useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		if ( ! hasIcon || ! hasIconBlock || ! templateIconBlock ) {
-			return;
-		}
-
-		if ( innerBlockCount === 0 ) {
-			const newBlock = createBlock(
-				templateIconBlock,
-				getIconTemplateAttributes()
-			);
-			insertBlock( newBlock, 0, clientId, false );
-			selectBlock( newBlock.clientId );
-		}
-	}, [
-		hasIcon,
-		hasIconBlock,
-		templateIconBlock,
-		innerBlockCount,
-		insertBlock,
-		selectBlock,
-		clientId,
-	] );
 
 	useEffect( () => {
 		if ( ! hasIcon ) {
