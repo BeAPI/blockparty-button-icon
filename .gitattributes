@@ -1,10 +1,9 @@
 /.git export-ignore
 /.github export-ignore
-/.wordpress-org export-ignore
 /src/ export-ignore -diff
-/vendor/ export-ignore -diff
 /node_modules export-ignore
 /tests export-ignore
+# Keep .wordpress-org/blueprints and vendor/ available for Playground git:directory installs.
 
 /.distignore export-ignore
 /.editorconfig export-ignore
