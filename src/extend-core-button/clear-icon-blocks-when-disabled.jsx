@@ -6,6 +6,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Removes nested icon blocks when hasIcon is cleared.
  *
  * Lives outside ButtonIconEdit so cleanup still runs after that edit UI unmounts.
+ * Uses replaceInnerBlocks (not removeBlocks): icon blocks are inserted with
+ * lock.remove true, so canRemoveBlock would no-op a removeBlocks dispatch.
  *
  * @param {Object}  props          Component props.
  * @param {string}  props.clientId Button block client id.
@@ -17,18 +19,15 @@ export default function ClearIconBlocksWhenDisabled( { clientId, hasIcon } ) {
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
 	);
-	const { removeBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		if ( hasIcon || innerBlocks.length === 0 ) {
 			return;
 		}
 
-		removeBlocks(
-			innerBlocks.map( ( block ) => block.clientId ),
-			false
-		);
-	}, [ hasIcon, innerBlocks, removeBlocks ] );
+		replaceInnerBlocks( clientId, [], false );
+	}, [ clientId, hasIcon, innerBlocks, replaceInnerBlocks ] );
 
 	return null;
 }
