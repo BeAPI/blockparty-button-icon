@@ -77,29 +77,15 @@ export default function ButtonIconEdit( props ) {
 	const hasIconBlock = registeredIconBlocks.length > 0;
 	const templateIconBlock = registeredIconBlocks[ 0 ];
 
-	const { innerBlocks, innerBlockCount } = useSelect(
-		( select ) => {
-			const { getBlocks } = select( blockEditorStore );
-			const blocks = getBlocks( clientId );
-			return {
-				innerBlocks: blocks,
-				innerBlockCount: blocks.length,
-			};
-		},
+	const innerBlockCount = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
 
-	const { insertBlock, removeBlocks, selectBlock } =
-		useDispatch( blockEditorStore );
+	const { insertBlock, selectBlock } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		if ( ! hasIcon || ! hasIconBlock || ! templateIconBlock ) {
-			if ( ! hasIcon && innerBlockCount > 0 ) {
-				removeBlocks(
-					innerBlocks.map( ( block ) => block.clientId ),
-					false
-				);
-			}
 			return;
 		}
 
@@ -116,9 +102,7 @@ export default function ButtonIconEdit( props ) {
 		hasIconBlock,
 		templateIconBlock,
 		innerBlockCount,
-		innerBlocks,
 		insertBlock,
-		removeBlocks,
 		selectBlock,
 		clientId,
 	] );

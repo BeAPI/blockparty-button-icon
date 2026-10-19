@@ -1,5 +1,6 @@
 import ButtonIconEdit from './edit';
 import ButtonIconControls from './button-icon-controls';
+import ClearIconBlocksWhenDisabled from './clear-icon-blocks-when-disabled';
 import { getRegisteredIconBlocks } from './get-registered-icon-blocks';
 
 /**
@@ -14,20 +15,26 @@ export default function EditWithIconToolbar( props, OriginalEdit ) {
 	const { hasIcon, iconPosition } = attributes;
 	const hasIconBlock = getRegisteredIconBlocks().length > 0;
 
-	if ( hasIcon ) {
-		return <ButtonIconEdit { ...props } />;
-	}
-
 	return (
 		<>
-			<ButtonIconControls
-				hasIcon={ hasIcon }
-				iconPosition={ iconPosition }
-				hasIconBlock={ hasIconBlock }
+			<ClearIconBlocksWhenDisabled
 				clientId={ clientId }
-				setAttributes={ setAttributes }
+				hasIcon={ hasIcon }
 			/>
-			<OriginalEdit { ...props } />
+			{ hasIcon ? (
+				<ButtonIconEdit { ...props } />
+			) : (
+				<>
+					<ButtonIconControls
+						hasIcon={ hasIcon }
+						iconPosition={ iconPosition }
+						hasIconBlock={ hasIconBlock }
+						clientId={ clientId }
+						setAttributes={ setAttributes }
+					/>
+					<OriginalEdit { ...props } />
+				</>
+			) }
 		</>
 	);
 }
