@@ -1,7 +1,11 @@
-import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+import { prependHTTPS } from '@wordpress/url';
+import { NEW_TAB_REL, NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 
 /**
  * Maps LinkControl values to core/button link attributes.
+ *
+ * Mirrors @wordpress/block-library button helper: toggles nofollow without
+ * duplicating tokens, and adds/removes noopener when opening in a new tab.
  *
  * @param {Object}  options                 Link control state.
  * @param {string}  [options.rel]           Current rel attribute.
@@ -11,25 +15,36 @@ import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
  * @return {Object} Button attribute updates.
  */
 export const getUpdatedLinkAttributes = ( {
-	rel,
-	url,
+	rel = '',
+	url = '',
 	opensInNewTab,
 	nofollow,
 } ) => {
-	let nextRel = rel;
+	let newLinkTarget;
+	let updatedRel = rel;
+
+	if ( opensInNewTab ) {
+		newLinkTarget = NEW_TAB_TARGET;
+		updatedRel = updatedRel?.includes( NEW_TAB_REL )
+			? updatedRel
+			: updatedRel + ` ${ NEW_TAB_REL }`;
+	} else {
+		const relRegex = new RegExp( `\\b${ NEW_TAB_REL }\\s*`, 'g' );
+		updatedRel = updatedRel?.replace( relRegex, '' ).trim();
+	}
 
 	if ( nofollow ) {
-		nextRel = nextRel ? `${ nextRel } ${ NOFOLLOW_REL }` : NOFOLLOW_REL;
-	} else if ( nextRel ) {
-		nextRel = nextRel
-			.split( /\s+/ )
-			.filter( ( token ) => token && token !== NOFOLLOW_REL )
-			.join( ' ' );
+		updatedRel = updatedRel?.includes( NOFOLLOW_REL )
+			? updatedRel
+			: ( updatedRel + ` ${ NOFOLLOW_REL }` ).trim();
+	} else {
+		const relRegex = new RegExp( `\\b${ NOFOLLOW_REL }\\s*`, 'g' );
+		updatedRel = updatedRel?.replace( relRegex, '' ).trim();
 	}
 
 	return {
-		url,
-		linkTarget: opensInNewTab ? NEW_TAB_TARGET : undefined,
-		rel: nextRel || undefined,
+		url: prependHTTPS( url ),
+		linkTarget: newLinkTarget,
+		rel: updatedRel || undefined,
 	};
 };
