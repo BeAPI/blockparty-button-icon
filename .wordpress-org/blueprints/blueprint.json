@@ -1,6 +1,6 @@
 {
 	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
-	"landingPage": "/blockparty-button-icon-demo/",
+	"landingPage": "/",
 	"preferredVersions": {
 		"php": "8.1",
 		"wp": "latest"

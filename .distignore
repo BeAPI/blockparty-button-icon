@@ -1,10 +1,13 @@
+# Directories
 /.git
 /.github
-/.wordpress-org
 /node_modules
 /src
 /tests
+# Keep .wordpress-org/blueprints in release tags so Playground git:directory
+# installs (and WordPress.org Live Preview) can bootstrap the demo.
 
+# Configuration files
 .distignore
 .editorconfig
 .eslintrc
@@ -13,15 +16,25 @@
 .plugin-data
 .stylelintrc
 .wp-env.json
-CHANGELOG.md
-composer.json
-composer.lock
 grumphp.yml
-LICENSE.md
-package.json
-package-lock.json
 phpcs.xml.dist
 phpunit.xml.dist
+
+# Dependency management
+composer.json
+composer.lock
+package.json
+package-lock.json
+
+# Documentation
+CHANGELOG.md
+LICENSE.md
 README.md
+
+# Development files
 webpack.config.js
 yarn.lock
+*.log
+*.map
+.DS_Store
+

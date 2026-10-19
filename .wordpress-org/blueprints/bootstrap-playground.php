@@ -19,10 +19,12 @@ if ( ! is_readable( $plugin_dir . '/vendor/autoload.php' ) || ! is_readable( $pl
 $content_file = $plugin_dir . '/.wordpress-org/blueprints/demo-page-content.html';
 $page_content = is_readable( $content_file ) ? file_get_contents( $content_file ) : '';
 
-if ( '' === $page_content ) {
+if ( false === $page_content || '' === $page_content ) {
 	echo 'Demo page content file missing.';
 	return;
 }
+
+update_option( 'permalink_structure', '/%postname%/' );
 
 $page_id = wp_insert_post(
 	array(
@@ -31,7 +33,17 @@ $page_id = wp_insert_post(
 		'post_content' => $page_content,
 		'post_status'  => 'publish',
 		'post_type'    => 'page',
-	)
+	),
+	true
 );
+
+if ( is_wp_error( $page_id ) ) {
+	echo 'Failed to create demo page: ' . $page_id->get_error_message();
+	return;
+}
+
+update_option( 'show_on_front', 'page' );
+update_option( 'page_on_front', (int) $page_id );
+flush_rewrite_rules( false );
 
 echo 'Page created with ID: ' . (int) $page_id;
