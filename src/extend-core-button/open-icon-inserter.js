@@ -11,8 +11,8 @@ const RETRY_DELAY_MS = 50;
  * @param {string} text Raw label text.
  * @return {string} Normalized label.
  */
-function normalizeLabel(text) {
-	return text.replace(/\s+/g, ' ').trim().toLowerCase();
+function normalizeLabel( text ) {
+	return text.replace( /\s+/g, ' ' ).trim().toLowerCase();
 }
 
 /**
@@ -23,7 +23,7 @@ function normalizeLabel(text) {
 function getIconLibraryOpenLabels() {
 	// Match core/icon toolbar labels (default text domain).
 	return new Set(
-		[__('Choose icon'), __('Replace')].map(normalizeLabel)
+		[ __( 'Choose icon' ), __( 'Replace' ) ].map( normalizeLabel )
 	);
 }
 
@@ -36,25 +36,25 @@ function getIconLibraryOpenLabels() {
  * @param {HTMLElement} button Toolbar button element.
  * @return {boolean} True when the control opens the icon library.
  */
-export function isIconLibraryToolbarButton(button) {
+export function isIconLibraryToolbarButton( button ) {
 	if (
 		button.disabled ||
-		button.getAttribute('aria-disabled') === 'true'
+		button.getAttribute( 'aria-disabled' ) === 'true'
 	) {
 		return false;
 	}
 
-	const text = button.textContent?.replace(/\s+/g, ' ').trim();
-	if (!text) {
+	const text = button.textContent?.replace( /\s+/g, ' ' ).trim();
+	if ( ! text ) {
 		return false;
 	}
 
 	// core/icon uses a text-only control; icon-only buttons are unrelated.
-	if (button.querySelector('svg')) {
+	if ( button.querySelector( 'svg' ) ) {
 		return false;
 	}
 
-	return getIconLibraryOpenLabels().has(normalizeLabel(text));
+	return getIconLibraryOpenLabels().has( normalizeLabel( text ) );
 }
 
 /**
@@ -67,13 +67,13 @@ function clickIconLibraryToolbarButton() {
 		'.block-editor-block-contextual-toolbar, .block-editor-block-toolbar'
 	);
 
-	for (const toolbar of toolbars) {
+	for ( const toolbar of toolbars ) {
 		const buttons = toolbar.querySelectorAll(
 			'button.components-toolbar-button, button.components-button'
 		);
 
-		for (const button of buttons) {
-			if (isIconLibraryToolbarButton(button)) {
+		for ( const button of buttons ) {
+			if ( isIconLibraryToolbarButton( button ) ) {
 				button.click();
 				return true;
 			}
@@ -88,23 +88,23 @@ function clickIconLibraryToolbarButton() {
  *
  * @param {string} iconClientId Inner icon block client id.
  */
-export function openIconInserterForBlock(iconClientId) {
-	if (!iconClientId) {
+export function openIconInserterForBlock( iconClientId ) {
+	if ( ! iconClientId ) {
 		return;
 	}
 
-	const { selectBlock } = dispatch(blockEditorStore);
-	selectBlock(iconClientId);
+	const { selectBlock } = dispatch( blockEditorStore );
+	selectBlock( iconClientId );
 
-	const tryOpen = (attempt) => {
-		if (clickIconLibraryToolbarButton()) {
+	const tryOpen = ( attempt ) => {
+		if ( clickIconLibraryToolbarButton() ) {
 			return;
 		}
 
-		if (attempt < MAX_ATTEMPTS) {
-			window.setTimeout(() => tryOpen(attempt + 1), RETRY_DELAY_MS);
+		if ( attempt < MAX_ATTEMPTS ) {
+			window.setTimeout( () => tryOpen( attempt + 1 ), RETRY_DELAY_MS );
 		}
 	};
 
-	window.requestAnimationFrame(() => tryOpen(0));
+	window.requestAnimationFrame( () => tryOpen( 0 ) );
 }
