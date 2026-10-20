@@ -23,7 +23,7 @@ function normalizeLabel(text) {
 function getIconLibraryOpenLabels() {
 	// Match core/icon toolbar labels (default text domain).
 	return new Set(
-		[ __( 'Choose icon' ), __( 'Replace' ) ].map( normalizeLabel )
+		[__('Choose icon'), __('Replace')].map(normalizeLabel)
 	);
 }
 
