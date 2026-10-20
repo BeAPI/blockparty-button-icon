@@ -34,7 +34,10 @@
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
-    "wp-coding-standards/wpcs": "^3.0"
+    "phpunit/phpunit": "9.6.37",
+    "wp-coding-standards/wpcs": "^3.0",
+    "wp-phpunit/wp-phpunit": "7.1.1",
+    "yoast/phpunit-polyfills": "4.0.0"
   },
   "scripts": {
     "cs": "./vendor/bin/phpcs",

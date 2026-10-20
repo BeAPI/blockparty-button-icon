@@ -14,8 +14,19 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"env:start": "wp-env start",
+		"env:start-tests": "wp-env start --xdebug=coverage --config=./.wp-env.test.json",
+		"env:start-ci": "wp-env start --config=./.wp-env.test.json",
 		"env:stop": "wp-env stop",
+		"env:stop-tests": "wp-env stop --config=./.wp-env.test.json",
+		"env:reset-tests": "wp-env destroy --config=./.wp-env.test.json --force && wp-env start --xdebug=coverage --config=./.wp-env.test.json",
+		"env:cli-test": "wp-env run cli --config=./.wp-env.test.json",
 		"env": "wp-env",
+		"test:php": "wp-env run cli --config=./.wp-env.test.json --env-cwd=wp-content/plugins/blockparty-button-icon/ -- ./vendor/bin/phpunit",
+		"test:php:coverage": "wp-env run cli --config=./.wp-env.test.json --env-cwd=wp-content/plugins/blockparty-button-icon/ -- ./vendor/bin/phpunit --coverage-html=./coverage/ --coverage-text",
+		"test:unit:js": "wp-scripts test-unit-jest",
+		"test:e2e": "playwright test --config tests/playwright/playwright.config.js",
+		"test:e2e-debug": "playwright test --headed --config tests/playwright/playwright.config.js",
+		"test:e2e-ui": "playwright test --ui --config tests/playwright/playwright.config.js",
 		"make-pot": "wp i18n make-pot . languages/blockparty-button-icon.pot --slug=blockparty-button-icon --domain=blockparty-button-icon --exclude=node_modules,src",
 		"make-json": "wp i18n make-json languages/ --no-purge",
 		"bump": "bash tests/bin/bump.sh"
@@ -35,8 +46,16 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.29.7",
+		"@playwright/test": "^1.64.1",
+		"@wordpress/babel-preset-default": "^8.55.0",
+		"@wordpress/e2e-test-utils-playwright": "^3.1.0",
 		"@wordpress/env": "^11.16.0",
+		"@wordpress/jest-preset-default": "^14.2.0",
 		"@wordpress/scripts": "^36.1.0",
+		"babel-jest": "^30.5.0",
+		"jest": "^30.5.0",
+		"jest-environment-jsdom": "^30.5.0",
 		"stylelint-config-recess-order": "^7.8.0"
 	},
 	"engines": {
