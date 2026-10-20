@@ -137,6 +137,12 @@ if [ -f .wordpress-org/blueprints/blueprint.json ]; then
 		echo "::error::.wordpress-org/blueprints/blueprint.json pluginData.ref must be '${NEW_VER}' (got '${BP_REF}')"
 		fail=1
 	fi
+
+	BP_REF_TYPE=$(jq -r '.steps[] | select(.pluginData) | .pluginData.refType' .wordpress-org/blueprints/blueprint.json | head -1)
+	if [ "$BP_REF_TYPE" != "tag" ]; then
+		echo "::error::.wordpress-org/blueprints/blueprint.json pluginData.refType must be 'tag' (got '${BP_REF_TYPE}')"
+		fail=1
+	fi
 fi
 
 if [ -f blockparty-button-icon.php ]; then
