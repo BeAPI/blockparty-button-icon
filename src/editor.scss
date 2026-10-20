@@ -1,0 +1,40 @@
+.wp-block-button.blockparty-button-icon {
+    .wp-block-button__link {
+        display: inline-flex;
+        gap: .5em;
+        align-items: center;
+
+        > .block-editor-inner-blocks {
+            display: contents;
+        }
+
+        .block-editor-block-list__layout {
+            display: contents;
+        }
+
+        .block-editor-block-list__block {
+            display: inline-flex;
+            max-width: none;
+            min-height: 0;
+            margin: 0;
+            line-height: 0;
+            vertical-align: middle;
+        }
+    }
+
+    &.blockparty-button-icon--right .wp-block-button__link {
+        flex-direction: row-reverse;
+    }
+
+    .wp-block-icon {
+        display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        line-height: 0;
+
+        svg {
+            display: block;
+        }
+    }
+}

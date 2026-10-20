@@ -1,0 +1,87 @@
+name: "Release new TAG"
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: "Release new TAG"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Fetch tags
+        run: git fetch --tags --prune origin
+
+      - id: set-vars
+        name: "Set variable from .plugin-data file"
+        run: |
+          {
+            echo 'pluginData<<EOF'
+            cat ./.plugin-data
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - id: check-version
+        name: "Check version does not exists"
+        run: |
+          # Get the version from .plugin-data file.
+          VERSION=${{ fromJson(steps.set-vars.outputs.pluginData).version }}
+
+          echo "Get Branch tag"
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "Tag already exists, stop now";
+            exit 1;
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${VERSION}" >/dev/null 2>&1; then
+            echo "Remote tag already exists, stop now";
+            exit 1;
+          fi
+
+      - id: build-node
+        name: Setup NodeJS
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: 'package.json'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+      - id: build-php
+        name: "Build project PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+      - run: composer install --prefer-dist --no-dev -o --ignore-platform-reqs
+
+      - id: commit-and-push
+        name: "Commit and push new TAG"
+        run: |
+          # Get the version from .plugin-data file.
+          VERSION=${{ fromJson(steps.set-vars.outputs.pluginData).version }}
+
+          echo "Copy .distignore to .gitignore"
+          cp .distignore .gitignore
+
+          echo "Configure git"
+          git config --local user.email "$(git log --format='%ae' HEAD^!)"
+          git config --local user.name "$(git log --format='%an' HEAD^!)"
+
+          echo "Creating branch"
+          git checkout -b "release/${VERSION}"
+
+          echo "Creating tag ${VERSION}"
+          git add .
+          git add -u
+          git commit -m "Release version ${VERSION}"
+          git tag ${VERSION}
+          git push --tags
