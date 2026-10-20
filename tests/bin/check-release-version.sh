@@ -47,21 +47,33 @@ if [ -z "${BASE_SHA:-}" ] || [ -z "${HEAD_SHA:-}" ]; then
 	exit 1
 fi
 
-NEW_VER=$(jq -r .version .plugin-data)
-
-if ! git cat-file -e "${BASE_SHA}:.plugin-data" 2>/dev/null; then
-	echo "::error::Could not read .plugin-data at merge base. Ensure the base branch has .plugin-data."
-	exit 1
+if [ ! -f .plugin-data ]; then
+	echo "No .plugin-data in working tree. Skipping release and tag checks."
+	exit 0
 fi
 
-OLD_VER=$(git show "${BASE_SHA}:.plugin-data" | jq -r .version)
+NEW_VER=$(jq -r .version .plugin-data)
 
-if [ "$OLD_VER" = "$NEW_VER" ]; then
+# Missing .plugin-data on the base branch means this is the first release.
+FIRST_RELEASE=0
+if ! git cat-file -e "${BASE_SHA}:.plugin-data" 2>/dev/null; then
+	FIRST_RELEASE=1
+	OLD_VER=
+	echo "No .plugin-data at merge base (first release). Skipping version-bump diff requirements."
+else
+	OLD_VER=$(git show "${BASE_SHA}:.plugin-data" | jq -r .version)
+fi
+
+if [ "$FIRST_RELEASE" -eq 0 ] && [ "$OLD_VER" = "$NEW_VER" ]; then
 	echo "No version change in .plugin-data (${NEW_VER}). Skipping release and tag checks."
 	exit 0
 fi
 
-echo "Version bump detected: ${OLD_VER} -> ${NEW_VER}"
+if [ "$FIRST_RELEASE" -eq 1 ]; then
+	echo "First release: ${NEW_VER}"
+else
+	echo "Version bump detected: ${OLD_VER} -> ${NEW_VER}"
+fi
 
 if git show-ref --verify --quiet "refs/tags/${NEW_VER}"; then
 	echo "::error::Tag '${NEW_VER}' already exists. Bump .plugin-data to a version that is not released yet."
@@ -72,35 +84,42 @@ have_diff() {
 	[ -n "$(git diff --name-only "${BASE_SHA}" "${HEAD_SHA}" -- "$1")" ]
 }
 
-missing=()
-for f in \
-	.plugin-data \
-	package.json \
-	blockparty-button-icon.php \
-	readme.txt \
-	.wordpress-org/blueprints/blueprint.json \
-	CHANGELOG.md
-do
-	if ! have_diff "$f"; then
-		missing+=("$f")
-	fi
-done
+# Subsequent bumps must touch every versioned path that exists in the tree.
+# First release skips this gate: files may already match the initial version.
+if [ "$FIRST_RELEASE" -eq 0 ]; then
+	missing=()
+	for f in \
+		.plugin-data \
+		package.json \
+		blockparty-button-icon.php \
+		readme.txt \
+		.wordpress-org/blueprints/blueprint.json \
+		CHANGELOG.md
+	do
+		if [ ! -e "$f" ]; then
+			continue
+		fi
+		if ! have_diff "$f"; then
+			missing+=("$f")
+		fi
+	done
 
-while IFS= read -r -d '' f; do
-	if ! have_diff "$f"; then
-		missing+=("$f (block.json)")
-	fi
-done < <(find ./src -name block.json -print0 2>/dev/null)
+	while IFS= read -r -d '' f; do
+		if ! have_diff "$f"; then
+			missing+=("$f (block.json)")
+		fi
+	done < <(find ./src -name block.json -print0 2>/dev/null)
 
-if [ ${#missing[@]} -ne 0 ]; then
-	echo "::error::This PR bumps the plugin version. The following required paths must be modified (diff vs base branch):"
-	printf '  - %s\n' "${missing[@]}"
-	exit 1
+	if [ ${#missing[@]} -ne 0 ]; then
+		echo "::error::This PR bumps the plugin version. The following required paths must be modified (diff vs base branch):"
+		printf '  - %s\n' "${missing[@]}"
+		exit 1
+	fi
 fi
 
-# Consistency: declared version must match .plugin-data everywhere
+# Consistency: declared version must match .plugin-data everywhere the file exists.
 fail=0
-if [ "$(jq -r .version package.json)" != "$NEW_VER" ]; then
+if [ -f package.json ] && [ "$(jq -r .version package.json)" != "$NEW_VER" ]; then
 	echo "::error::package.json version must equal ${NEW_VER} (from .plugin-data)"
 	fail=1
 fi
@@ -112,33 +131,39 @@ while IFS= read -r -d '' f; do
 	fi
 done < <(find ./src -name block.json -print0 2>/dev/null)
 
-BP_REF=$(jq -r '.steps[] | select(.pluginData) | .pluginData.ref' .wordpress-org/blueprints/blueprint.json | head -1)
-if [ "$BP_REF" != "$NEW_VER" ]; then
-	echo "::error::.wordpress-org/blueprints/blueprint.json pluginData.ref must be '${NEW_VER}' (got '${BP_REF}')"
-	fail=1
+if [ -f .wordpress-org/blueprints/blueprint.json ]; then
+	BP_REF=$(jq -r '.steps[] | select(.pluginData) | .pluginData.ref' .wordpress-org/blueprints/blueprint.json | head -1)
+	if [ "$BP_REF" != "$NEW_VER" ]; then
+		echo "::error::.wordpress-org/blueprints/blueprint.json pluginData.ref must be '${NEW_VER}' (got '${BP_REF}')"
+		fail=1
+	fi
 fi
 
-if ! grep -F "* Version:" blockparty-button-icon.php | head -1 | grep -qF "$NEW_VER"; then
-	echo "::error::blockparty-button-icon.php plugin header Version must be ${NEW_VER}"
-	fail=1
+if [ -f blockparty-button-icon.php ]; then
+	if ! grep -F "* Version:" blockparty-button-icon.php | head -1 | grep -qF "$NEW_VER"; then
+		echo "::error::blockparty-button-icon.php plugin header Version must be ${NEW_VER}"
+		fail=1
+	fi
+
+	if ! grep -qF "define( 'BLOCKPARTY_BUTTON_ICON_VERSION', '$NEW_VER' );" blockparty-button-icon.php; then
+		echo "::error::blockparty-button-icon.php define BLOCKPARTY_BUTTON_ICON_VERSION must be '${NEW_VER}'"
+		fail=1
+	fi
 fi
 
-if ! grep -qF "define( 'BLOCKPARTY_BUTTON_ICON_VERSION', '$NEW_VER' );" blockparty-button-icon.php; then
-	echo "::error::blockparty-button-icon.php define BLOCKPARTY_BUTTON_ICON_VERSION must be '${NEW_VER}'"
-	fail=1
+if [ -f readme.txt ]; then
+	if ! grep -E "^Stable tag:" readme.txt | grep -qF "$NEW_VER"; then
+		echo "::error::readme.txt Stable tag must be ${NEW_VER}"
+		fail=1
+	fi
+
+	if ! grep -qF "= ${NEW_VER} =" readme.txt; then
+		echo "::error::readme.txt Changelog must include '= ${NEW_VER} =' section"
+		fail=1
+	fi
 fi
 
-if ! grep -E "^Stable tag:" readme.txt | grep -qF "$NEW_VER"; then
-	echo "::error::readme.txt Stable tag must be ${NEW_VER}"
-	fail=1
-fi
-
-if ! grep -qF "= ${NEW_VER} =" readme.txt; then
-	echo "::error::readme.txt Changelog must include '= ${NEW_VER} =' section"
-	fail=1
-fi
-
-if ! grep -qF "$NEW_VER" CHANGELOG.md; then
+if [ -f CHANGELOG.md ] && ! grep -qF "$NEW_VER" CHANGELOG.md; then
 	echo "::error::CHANGELOG.md must mention the release version ${NEW_VER} (e.g. a [${NEW_VER}] section header)"
 	fail=1
 fi
