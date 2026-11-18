@@ -128,13 +128,27 @@ test.describe( 'Blockparty Button Icon editor', () => {
 
 		await expect( button ).toHaveClass( /blockparty-button-icon--only/ );
 		await expect( button.locator( '.wp-block-button__label' ) ).toHaveCount(
-			0
+			1
 		);
 
 		const labelField = page.getByRole( 'textbox', {
 			name: 'Label (screen readers)',
 		} );
 		await expect( labelField ).toHaveValue( 'Click me' );
+
+		// Clicking the nested icon must keep core/button selected so the Icon
+		// panel (and required screen-reader label) stay available.
+		await canvas.locator( '.wp-block-button .wp-block-icon' ).first().click();
+		await expect( labelField ).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: 'Replace Icon', exact: true } )
+		).toBeVisible();
+
+		const selectedBlockName = await page.evaluate( () => {
+			const { select } = window.wp.data;
+			return select( 'core/block-editor' ).getSelectedBlock()?.name;
+		} );
+		expect( selectedBlockName ).toBe( 'core/button' );
 
 		await labelField.fill( '' );
 		await expect(

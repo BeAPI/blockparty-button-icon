@@ -38,6 +38,7 @@ import {
 } from './constants';
 import { getButtonIconGapStyle } from './get-button-icon-gap-style';
 import { getButtonIconClassNames } from './get-button-icon-class-names';
+import { getButtonLabelPlainText } from './button-label-plain-text';
 import { normalizeButtonLabelText } from './normalize-button-label-text';
 
 const LINK_SETTINGS = [
@@ -170,9 +171,12 @@ export default function ButtonIconEdit( props ) {
 		/>
 	);
 
-	// Icon only: the label is edited from the sidebar, not shown in the canvas.
 	const isIconOnly = iconPosition === ICON_POSITION_ONLY;
-	const labelRichText = ! isIconOnly && (
+	const labelRichText = isIconOnly ? (
+		<span className={ BUTTON_LABEL_CLASS_NAME }>
+			{ getButtonLabelPlainText( text ) }
+		</span>
+	) : (
 		<RichText
 			ref={ richTextRef }
 			tagName="span"

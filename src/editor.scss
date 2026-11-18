@@ -26,6 +26,10 @@
         flex-direction: row-reverse;
     }
 
+    &.blockparty-button-icon--only .block-editor-block-list__block {
+        pointer-events: none;
+    }
+
     .wp-block-icon {
         display: inline-flex;
         flex-shrink: 0;

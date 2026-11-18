@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 - Add an **Icon only** position: the label is visually hidden but kept for screen readers, and edited from a required sidebar field
+- Fix icon-only editor selection so clicking the button keeps `core/button` selected (Icon panel and required screen-reader label stay available)
 - Mark icons rendered inside buttons as decorative (`aria-hidden="true"`)
 
 ## 1.0.0 - 2026-10-15
