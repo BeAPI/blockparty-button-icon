@@ -78,7 +78,7 @@ class IconBlockRendererTest extends WP_UnitTestCase {
 
 		$converted = $renderer->render_icon_as_span( $html, $icon );
 		$this->assertSame(
-			'<span class="wp-block-icon has-icon"><svg></svg></span>',
+			'<span aria-hidden="true" class="wp-block-icon has-icon"><svg></svg></span>',
 			$converted
 		);
 
@@ -145,8 +145,36 @@ class IconBlockRendererTest extends WP_UnitTestCase {
 		apply_filters( 'render_block_core/button', '<a class="wp-block-button__link"></a>', $button );
 
 		$this->assertSame(
-			'<span class="wp-block-icon"><svg></svg></span>',
+			'<span aria-hidden="true" class="wp-block-icon"><svg></svg></span>',
 			$result
+		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_hide_icon_from_assistive_technologies_adds_aria_hidden_once(): void {
+		$html   = '<span class="wp-block-icon"><svg role="img" aria-label="Arrow"></svg></span>';
+		$hidden = IconBlockRenderer::hide_icon_from_assistive_technologies( $html );
+
+		$this->assertStringContainsString( 'aria-hidden="true"', $hidden );
+		$this->assertSame(
+			$hidden,
+			IconBlockRenderer::hide_icon_from_assistive_technologies( $hidden ),
+			'Already hidden icons are left untouched.'
+		);
+		$this->assertSame( 1, substr_count( $hidden, 'aria-hidden' ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_hide_icon_from_assistive_technologies_is_noop_without_icon_class(): void {
+		$html = '<span class="other"><svg></svg></span>';
+
+		$this->assertSame(
+			$html,
+			IconBlockRenderer::hide_icon_from_assistive_technologies( $html )
 		);
 	}
 }

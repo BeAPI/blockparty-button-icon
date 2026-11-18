@@ -110,4 +110,79 @@ test.describe( 'Blockparty Button Icon editor', () => {
 
 		expect( nestedIconCount ).toBe( 0 );
 	} );
+
+	test( 'switches to icon only and edits the label from the sidebar', async ( {
+		editor,
+		page,
+	} ) => {
+		await insertButtonBlock( editor );
+
+		const canvas = await getEditorCanvas( page );
+		const button = canvas.locator( '.wp-block-button' ).first();
+		await expect( button ).toBeVisible( { timeout: 10_000 } );
+		await button.click();
+
+		await page.getByLabel( 'Icon', { exact: true } ).click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'radio', { name: 'Icon only' } ).click();
+
+		await expect( button ).toHaveClass( /blockparty-button-icon--only/ );
+		await expect( button.locator( '.wp-block-button__label' ) ).toHaveCount(
+			0
+		);
+
+		const labelField = page.getByRole( 'textbox', {
+			name: 'Label (screen readers)',
+		} );
+		await expect( labelField ).toHaveValue( 'Click me' );
+
+		await labelField.fill( '' );
+		await expect(
+			page
+				.locator( '.components-notice' )
+				.getByText(
+					'A label is required for an icon-only button to be accessible.'
+				)
+		).toBeVisible();
+
+		await labelField.fill( 'Next slide' );
+		await expect(
+			page
+				.locator( '.components-notice' )
+				.getByText(
+					'A label is required for an icon-only button to be accessible.'
+				)
+		).toHaveCount( 0 );
+
+		const [ buttonBlock ] = ( await editor.getBlocks() )[ 0 ].innerBlocks;
+		expect( buttonBlock.attributes.iconPosition ).toBe( 'only' );
+		expect( buttonBlock.attributes.text ).toBe( 'Next slide' );
+	} );
+
+	test( 'keeps v1.0.0 button markup valid', async ( { editor, page } ) => {
+		const legacyMarkup = [
+			'<!-- wp:buttons --><div class="wp-block-buttons">',
+			'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">No icon</a></div><!-- /wp:button -->',
+			'<!-- wp:button {"hasIcon":true} --><div class="wp-block-button blockparty-button-icon blockparty-button-icon--left"><a class="wp-block-button__link wp-element-button"><!-- wp:icon {"icon":"core/arrow-right"} /--><span class="wp-block-button__label">Left</span></a></div><!-- /wp:button -->',
+			'<!-- wp:button {"hasIcon":true,"iconPosition":"right"} --><div class="wp-block-button blockparty-button-icon blockparty-button-icon--right"><a class="wp-block-button__link wp-element-button"><!-- wp:icon {"icon":"core/arrow-right"} /--><span class="wp-block-button__label">Right</span></a></div><!-- /wp:button -->',
+			'</div><!-- /wp:buttons -->',
+		].join( '' );
+
+		await editor.setContent( legacyMarkup );
+
+		const invalidCount = await page.evaluate( () => {
+			const { select } = window.wp.data;
+			const walk = ( blocks ) =>
+				blocks.reduce(
+					( count, block ) =>
+						count +
+						( block.isValid ? 0 : 1 ) +
+						walk( block.innerBlocks ),
+					0
+				);
+			return walk( select( 'core/block-editor' ).getBlocks() );
+		} );
+
+		expect( invalidCount ).toBe( 0 );
+	} );
 } );

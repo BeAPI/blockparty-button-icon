@@ -74,3 +74,19 @@ msgstr "Ajouter du texte…"
 #: build/index.js:1
 msgid "Link"
 msgstr "Lien"
+
+#: build/index.js:1
+msgid "Icon only"
+msgstr "Icône seule"
+
+#: build/index.js:1
+msgid "Label (screen readers)"
+msgstr "Libellé (lecteurs d’écran)"
+
+#: build/index.js:1
+msgid "Required. Hidden on screen, announced by assistive technologies."
+msgstr "Obligatoire. Masqué à l’écran, annoncé par les technologies d’assistance."
+
+#: build/index.js:1
+msgid "A label is required for an icon-only button to be accessible."
+msgstr "Un libellé est obligatoire pour qu’un bouton icône seule soit accessible."
