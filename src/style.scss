@@ -9,6 +9,25 @@
         flex-direction: row-reverse;
     }
 
+    // Icon only: keep the label for assistive technologies, hide it visually.
+    &.blockparty-button-icon--only {
+        .wp-block-button__link {
+            position: relative;
+        }
+
+        .wp-block-button__label {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            white-space: nowrap;
+            border: 0;
+            clip-path: inset(50%);
+        }
+    }
+
     .wp-block-icon {
         display: inline-flex;
         flex-shrink: 0;

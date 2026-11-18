@@ -18,7 +18,7 @@ Blockparty Button Icon enhances the WordPress core Button block (`core/button`) 
 
 * Extends the core Button block (no new block name)
 * Optional icon via inner blocks (defaults to `core/icon`)
-* Icon position: left or right
+* Icon position: left, right or icon only (label kept for screen readers)
 * Horizontal block gap for icon ↔ label spacing
 * Valid HTML inside links (`span` wrapper for icons on the front end)
 * Filter `blockparty_button_icon_allowed_icon_blocks` to allow other icon block types

@@ -5,17 +5,27 @@ import {
 	Button,
 	ToolbarButton,
 	ToolbarGroup,
+	Notice,
 	PanelBody,
+	TextControl,
 	ToggleControl,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis -- ToggleGroupControl is not yet a stable export in @wordpress/components.
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { ICON_POSITION_LEFT, ICON_POSITION_RIGHT } from './constants';
+import {
+	ICON_POSITION_LEFT,
+	ICON_POSITION_ONLY,
+	ICON_POSITION_RIGHT,
+} from './constants';
 import IconToolbarSvg from './icon-toolbar-svg';
 import { getInnerIconClientId } from './get-inner-icon-client-id';
 import { openIconInserterForBlock } from './open-icon-inserter';
+import {
+	getButtonLabelPlainText,
+	plainTextToButtonLabel,
+} from './button-label-plain-text';
 
 /**
  * Toolbar and inspector controls for button icons.
@@ -25,6 +35,7 @@ import { openIconInserterForBlock } from './open-icon-inserter';
  * @param {string}                         props.iconPosition  Icon position relative to label.
  * @param {boolean}                        props.hasIconBlock  Whether core/icon is available.
  * @param {string}                         props.clientId      Button block client id.
+ * @param {string}                         [props.text]        Button label (rich-text HTML).
  * @param {( attributes: Object ) => void} props.setAttributes Attribute updater.
  * @return {Element} Controls fragment.
  */
@@ -33,12 +44,16 @@ export default function ButtonIconControls( {
 	iconPosition,
 	hasIconBlock,
 	clientId,
+	text,
 	setAttributes,
 } ) {
 	const iconClientId = useSelect(
 		( select ) => getInnerIconClientId( select, clientId ),
 		[ clientId ]
 	);
+	const isIconOnly = hasIcon && iconPosition === ICON_POSITION_ONLY;
+	const plainLabel = getButtonLabelPlainText( text );
+	const isLabelMissing = isIconOnly && '' === plainLabel.trim();
 
 	return (
 		<>
@@ -105,7 +120,51 @@ export default function ButtonIconControls( {
 										'blockparty-button-icon'
 									) }
 								/>
+								<ToggleGroupControlOption
+									value={ ICON_POSITION_ONLY }
+									label={ __(
+										'Icon only',
+										'blockparty-button-icon'
+									) }
+								/>
 							</ToggleGroupControl>
+							{ isIconOnly && (
+								<>
+									<TextControl
+										label={ __(
+											'Label (screen readers)',
+											'blockparty-button-icon'
+										) }
+										help={ __(
+											'Required. Hidden on screen, announced by assistive technologies.',
+											'blockparty-button-icon'
+										) }
+										value={ plainLabel }
+										required
+										aria-invalid={ isLabelMissing }
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										onChange={ ( value ) => {
+											setAttributes( {
+												text: plainTextToButtonLabel(
+													value
+												),
+											} );
+										} }
+									/>
+									{ isLabelMissing && (
+										<Notice
+											status="error"
+											isDismissible={ false }
+										>
+											{ __(
+												'A label is required for an icon-only button to be accessible.',
+												'blockparty-button-icon'
+											) }
+										</Notice>
+									) }
+								</>
+							) }
 							<Button
 								variant="secondary"
 								__next40pxDefaultSize

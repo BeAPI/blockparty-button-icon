@@ -8,7 +8,8 @@
 namespace Blockparty\ButtonIcon;
 
 /**
- * Converts core/icon wrappers so markup stays valid inside button links.
+ * Converts core/icon wrappers so markup stays valid inside button links
+ * and marks them as decorative.
  */
 class IconBlockRenderer {
 
@@ -102,7 +103,35 @@ class IconBlockRenderer {
 			return $block_content;
 		}
 
-		return self::convert_icon_wrapper_to_span( $block_content );
+		return self::hide_icon_from_assistive_technologies(
+			self::convert_icon_wrapper_to_span( $block_content )
+		);
+	}
+
+	/**
+	 * Marks the icon wrapper as decorative (aria-hidden="true").
+	 *
+	 * Inside a button the text label always provides the accessible name, even
+	 * when it is visually hidden (icon only). An icon aria-label would otherwise
+	 * be announced in addition to the label.
+	 *
+	 * @param string $html Rendered icon block HTML.
+	 * @return string HTML with aria-hidden on the icon wrapper when applicable.
+	 */
+	public static function hide_icon_from_assistive_technologies( string $html ): string {
+		$processor = new \WP_HTML_Tag_Processor( $html );
+
+		if ( ! $processor->next_tag( array( 'class_name' => 'wp-block-icon' ) ) ) {
+			return $html;
+		}
+
+		if ( 'true' === $processor->get_attribute( 'aria-hidden' ) ) {
+			return $html;
+		}
+
+		$processor->set_attribute( 'aria-hidden', 'true' );
+
+		return $processor->get_updated_html();
 	}
 
 	/**
