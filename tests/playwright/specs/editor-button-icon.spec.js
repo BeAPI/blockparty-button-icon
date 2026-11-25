@@ -147,22 +147,22 @@ test.describe( 'Blockparty Button Icon editor', () => {
 		} );
 		await expect( labelField ).toHaveValue( 'Click me' );
 
-		// Clicking the nested icon must keep core/button selected so the Icon
-		// panel (and required screen-reader label) stay available.
+		// Like left/right, clicking the icon selects it (to replace it from its
+		// toolbar); the required label stays editable from the icon inspector.
 		await canvas
 			.locator( '.wp-block-button .wp-block-icon' )
 			.first()
 			.click();
-		await expect( labelField ).toBeVisible();
-		await expect(
-			page.getByRole( 'button', { name: 'Replace Icon', exact: true } )
-		).toBeVisible();
 
 		const selectedBlockName = await page.evaluate( () => {
 			const { select } = window.wp.data;
 			return select( 'core/block-editor' ).getSelectedBlock()?.name;
 		} );
-		expect( selectedBlockName ).toBe( 'core/button' );
+		expect( selectedBlockName ).toBe( 'core/icon' );
+		await expect(
+			page.locator( '.blockparty-button-icon-notice' )
+		).toBeVisible();
+		await expect( labelField ).toHaveValue( 'Click me' );
 
 		await labelField.fill( '' );
 		await expect(

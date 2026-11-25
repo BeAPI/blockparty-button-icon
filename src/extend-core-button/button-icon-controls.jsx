@@ -5,9 +5,7 @@ import {
 	Button,
 	ToolbarButton,
 	ToolbarGroup,
-	Notice,
 	PanelBody,
-	TextControl,
 	ToggleControl,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis -- ToggleGroupControl is not yet a stable export in @wordpress/components.
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -22,10 +20,7 @@ import {
 import IconToolbarSvg from './icon-toolbar-svg';
 import { getInnerIconClientId } from './get-inner-icon-client-id';
 import { openIconInserterForBlock } from './open-icon-inserter';
-import {
-	getButtonLabelPlainText,
-	plainTextToButtonLabel,
-} from './button-label-plain-text';
+import IconOnlyLabelControl from './icon-only-label-control';
 
 /**
  * Toolbar and inspector controls for button icons.
@@ -52,8 +47,6 @@ export default function ButtonIconControls( {
 		[ clientId ]
 	);
 	const isIconOnly = hasIcon && iconPosition === ICON_POSITION_ONLY;
-	const plainLabel = getButtonLabelPlainText( text );
-	const isLabelMissing = isIconOnly && '' === plainLabel.trim();
 
 	return (
 		<>
@@ -129,41 +122,12 @@ export default function ButtonIconControls( {
 								/>
 							</ToggleGroupControl>
 							{ isIconOnly && (
-								<>
-									<TextControl
-										label={ __(
-											'Label (screen readers)',
-											'blockparty-button-icon'
-										) }
-										help={ __(
-											'Required. Hidden on screen, announced by assistive technologies.',
-											'blockparty-button-icon'
-										) }
-										value={ plainLabel }
-										required
-										aria-invalid={ isLabelMissing }
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										onChange={ ( value ) => {
-											setAttributes( {
-												text: plainTextToButtonLabel(
-													value
-												),
-											} );
-										} }
-									/>
-									{ isLabelMissing && (
-										<Notice
-											status="error"
-											isDismissible={ false }
-										>
-											{ __(
-												'A label is required for an icon-only button to be accessible.',
-												'blockparty-button-icon'
-											) }
-										</Notice>
-									) }
-								</>
+								<IconOnlyLabelControl
+									text={ text }
+									onChange={ ( value ) => {
+										setAttributes( { text: value } );
+									} }
+								/>
 							) }
 							<Button
 								variant="secondary"

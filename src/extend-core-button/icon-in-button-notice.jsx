@@ -1,13 +1,14 @@
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Notice } from '@wordpress/components';
-import { BUTTON_BLOCK_NAME } from './constants';
+import { BUTTON_BLOCK_NAME, ICON_POSITION_ONLY } from './constants';
+import IconOnlyLabelControl from './icon-only-label-control';
 import { getRegisteredIconBlocks } from './get-registered-icon-blocks';
 
 /**
@@ -15,34 +16,46 @@ import { getRegisteredIconBlocks } from './get-registered-icon-blocks';
  *
  * The front end hides the icon from assistive technologies as soon as the
  * button label has text, so an icon aria-label is only used as a fallback.
+ * For icon-only buttons, the icon is the only click target in the canvas, so
+ * the required button label field is repeated here.
  */
 const withIconInButtonNotice = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name, clientId, isSelected } = props;
 		const isIconBlock = getRegisteredIconBlocks().includes( name );
 
-		const isInsideIconButton = useSelect(
+		const parentButton = useSelect(
 			( select ) => {
 				if ( ! isIconBlock || ! isSelected ) {
-					return false;
+					return null;
 				}
 
 				const { getBlockRootClientId, getBlock } =
 					select( blockEditorStore );
 				const parent = getBlock( getBlockRootClientId( clientId ) );
 
-				return (
-					parent?.name === BUTTON_BLOCK_NAME &&
-					!! parent.attributes?.hasIcon
-				);
+				if (
+					parent?.name !== BUTTON_BLOCK_NAME ||
+					! parent.attributes?.hasIcon
+				) {
+					return null;
+				}
+
+				return {
+					clientId: parent.clientId,
+					text: parent.attributes.text,
+					isIconOnly:
+						parent.attributes.iconPosition === ICON_POSITION_ONLY,
+				};
 			},
 			[ clientId, isIconBlock, isSelected ]
 		);
+		const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ isInsideIconButton && (
+				{ parentButton && (
 					<InspectorControls>
 						<div className="blockparty-button-icon-notice">
 							<Notice status="info" isDismissible={ false }>
@@ -51,6 +64,17 @@ const withIconInButtonNotice = createHigherOrderComponent(
 									'blockparty-button-icon'
 								) }
 							</Notice>
+							{ parentButton.isIconOnly && (
+								<IconOnlyLabelControl
+									text={ parentButton.text }
+									onChange={ ( value ) => {
+										updateBlockAttributes(
+											parentButton.clientId,
+											{ text: value }
+										);
+									} }
+								/>
+							) }
 						</div>
 					</InspectorControls>
 				) }

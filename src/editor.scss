@@ -26,10 +26,6 @@
         flex-direction: row-reverse;
     }
 
-    &.blockparty-button-icon--only .block-editor-block-list__block {
-        pointer-events: none;
-    }
-
     .wp-block-icon {
         display: inline-flex;
         flex-shrink: 0;
@@ -44,5 +40,8 @@
 }
 
 .blockparty-button-icon-notice {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     padding: 0 16px 16px;
 }
