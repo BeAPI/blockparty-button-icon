@@ -10,7 +10,7 @@ Extend the WordPress **core Button** block (`core/button`) with optional icons, 
 
 - **Core block extension**: No new block name — editors keep using the familiar Button block
 - **Optional icon**: Insert an icon as an inner block (defaults to `core/icon` on WordPress 7.0+)
-- **Icon position**: Display the icon to the left or right of the label
+- **Icon position**: Display the icon to the left or right of the label, or show the icon only (label kept for screen readers)
 - **Block gap**: Control horizontal spacing between icon and text via block spacing settings
 - **Valid markup**: Icons render inside links with a `span` wrapper on the front end (phrasing content)
 - **Extensible**: Filter which icon block types may be inserted into a button
@@ -42,7 +42,9 @@ composer require beapi/blockparty-button-icon
 1. Add or select a **Button** block in the editor
 2. Open the block **Styles** panel (sidebar)
 3. Turn on **Show icon**
-4. Choose **Left** or **Right** for icon position
+4. Choose **Left**, **Right** or **Icon only** for icon position
+   - With **Icon only**, the label is hidden in the canvas and on the front end; fill the required **Label (screen readers)** field in the sidebar
+   - This field is plain text: editing it removes any formatting from the label (bold, italic, `<span lang>`). Switching back to **Left** or **Right** keeps the plain text
 5. Use the block toolbar **Icon** control to pick or replace the icon
 6. Adjust **Block spacing → Block gap** (horizontal) to change the space between icon and label
 
@@ -67,6 +69,8 @@ The first block type in the filtered list is used when the editor creates a new 
 
 - Button label text is wrapped in `<span class="wp-block-button__label">` when an icon is present, keeping a clear text node for assistive technologies
 - On the front end, `core/icon` outer wrappers are output as `span` elements when rendered inside button links
+- Icons inside buttons get `aria-hidden="true"` when the button label has text: the label then provides the accessible name. When the label is empty (for example a v1.0.0 icon-only button relying on the icon alternative text), the icon is left exposed so the button keeps a name
+- **Icon only** buttons keep the label in the markup and hide it visually (`.blockparty-button-icon--only .wp-block-button__label`), so links and buttons keep an accessible name
 
 ## Generated markup example
 
@@ -75,6 +79,17 @@ The first block type in the filtered list is used when the editor creates a new 
 	<a class="wp-block-button__link wp-element-button" href="#" style="gap:var(--wp--preset--spacing--20)">
 		<span class="wp-block-icon" aria-hidden="true">…</span>
 		<span class="wp-block-button__label">Get started</span>
+	</a>
+</div>
+```
+
+Icon only:
+
+```html
+<div class="wp-block-button blockparty-button-icon blockparty-button-icon--only">
+	<a class="wp-block-button__link wp-element-button" href="#">
+		<span class="wp-block-icon" aria-hidden="true">…</span>
+		<span class="wp-block-button__label">Next slide</span>
 	</a>
 </div>
 ```

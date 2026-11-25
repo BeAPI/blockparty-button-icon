@@ -32,11 +32,13 @@ import { getIconTemplateAttributes } from './get-icon-template-attributes';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import {
 	BUTTON_LABEL_CLASS_NAME,
-	ICON_POSITION_RIGHT,
+	ICON_POSITION_ONLY,
 	NEW_TAB_TARGET,
 	NOFOLLOW_REL,
 } from './constants';
 import { getButtonIconGapStyle } from './get-button-icon-gap-style';
+import { getButtonIconClassNames } from './get-button-icon-class-names';
+import { getButtonLabelPlainText } from './button-label-plain-text';
 import { normalizeButtonLabelText } from './normalize-button-label-text';
 
 const LINK_SETTINGS = [
@@ -98,13 +100,7 @@ export default function ButtonIconEdit( props ) {
 
 	const blockProps = useBlockProps( {
 		ref: setPopoverAnchor,
-		className: clsx( {
-			'blockparty-button-icon': hasIcon,
-			'blockparty-button-icon--left':
-				hasIcon && iconPosition !== ICON_POSITION_RIGHT,
-			'blockparty-button-icon--right':
-				hasIcon && iconPosition === ICON_POSITION_RIGHT,
-		} ),
+		className: clsx( getButtonIconClassNames( hasIcon, iconPosition ) ),
 		onKeyDown( event ) {
 			if ( isKeyboardEvent.primary( event, 'k' ) ) {
 				event.preventDefault();
@@ -175,6 +171,29 @@ export default function ButtonIconEdit( props ) {
 		/>
 	);
 
+	const isIconOnly = iconPosition === ICON_POSITION_ONLY;
+	const labelRichText = isIconOnly ? (
+		<span className={ BUTTON_LABEL_CLASS_NAME }>
+			{ getButtonLabelPlainText( text ) }
+		</span>
+	) : (
+		<RichText
+			ref={ richTextRef }
+			tagName="span"
+			className={ BUTTON_LABEL_CLASS_NAME }
+			aria-label={ __( 'Button text', 'blockparty-button-icon' ) }
+			placeholder={
+				placeholder || __( 'Add text…', 'blockparty-button-icon' )
+			}
+			value={ text }
+			onChange={ ( value ) => {
+				setAttributes( { text: value } );
+			} }
+			withoutInteractiveFormatting
+			identifier="text"
+		/>
+	);
+
 	let buttonContent;
 
 	if ( ! hasIcon ) {
@@ -215,22 +234,7 @@ export default function ButtonIconEdit( props ) {
 				} }
 			>
 				{ iconInnerBlocks }
-				<RichText
-					ref={ richTextRef }
-					tagName="span"
-					className={ BUTTON_LABEL_CLASS_NAME }
-					aria-label={ __( 'Button text', 'blockparty-button-icon' ) }
-					placeholder={
-						placeholder ||
-						__( 'Add text…', 'blockparty-button-icon' )
-					}
-					value={ text }
-					onChange={ ( value ) => {
-						setAttributes( { text: value } );
-					} }
-					withoutInteractiveFormatting
-					identifier="text"
-				/>
+				{ labelRichText }
 			</a>
 		);
 	} else {
@@ -241,22 +245,7 @@ export default function ButtonIconEdit( props ) {
 				style={ buttonStyle }
 			>
 				{ iconInnerBlocks }
-				<RichText
-					ref={ richTextRef }
-					tagName="span"
-					className={ BUTTON_LABEL_CLASS_NAME }
-					aria-label={ __( 'Button text', 'blockparty-button-icon' ) }
-					placeholder={
-						placeholder ||
-						__( 'Add text…', 'blockparty-button-icon' )
-					}
-					value={ text }
-					onChange={ ( value ) => {
-						setAttributes( { text: value } );
-					} }
-					withoutInteractiveFormatting
-					identifier="text"
-				/>
+				{ labelRichText }
 			</button>
 		);
 	}
@@ -268,6 +257,7 @@ export default function ButtonIconEdit( props ) {
 				iconPosition={ iconPosition }
 				hasIconBlock={ hasIconBlock }
 				clientId={ clientId }
+				text={ text }
 				setAttributes={ setAttributes }
 			/>
 			<div { ...blockProps }>{ buttonContent }</div>
@@ -290,7 +280,7 @@ export default function ButtonIconEdit( props ) {
 					placement="bottom"
 					onClose={ () => {
 						setIsEditingURL( false );
-						richTextRef.current?.focus();
+						( richTextRef.current ?? popoverAnchor )?.focus();
 					} }
 					anchor={ popoverAnchor }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
@@ -320,7 +310,7 @@ export default function ButtonIconEdit( props ) {
 								rel: undefined,
 							} );
 							setIsEditingURL( false );
-							richTextRef.current?.focus();
+							( richTextRef.current ?? popoverAnchor )?.focus();
 						} }
 						forceIsEditingLink={ ! isURLSet }
 						settings={ LINK_SETTINGS }

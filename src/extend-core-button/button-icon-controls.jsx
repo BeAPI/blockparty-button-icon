@@ -12,10 +12,15 @@ import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { ICON_POSITION_LEFT, ICON_POSITION_RIGHT } from './constants';
+import {
+	ICON_POSITION_LEFT,
+	ICON_POSITION_ONLY,
+	ICON_POSITION_RIGHT,
+} from './constants';
 import IconToolbarSvg from './icon-toolbar-svg';
 import { getInnerIconClientId } from './get-inner-icon-client-id';
 import { openIconInserterForBlock } from './open-icon-inserter';
+import IconOnlyLabelControl from './icon-only-label-control';
 
 /**
  * Toolbar and inspector controls for button icons.
@@ -25,6 +30,7 @@ import { openIconInserterForBlock } from './open-icon-inserter';
  * @param {string}                         props.iconPosition  Icon position relative to label.
  * @param {boolean}                        props.hasIconBlock  Whether core/icon is available.
  * @param {string}                         props.clientId      Button block client id.
+ * @param {string}                         [props.text]        Button label (rich-text HTML).
  * @param {( attributes: Object ) => void} props.setAttributes Attribute updater.
  * @return {Element} Controls fragment.
  */
@@ -33,12 +39,14 @@ export default function ButtonIconControls( {
 	iconPosition,
 	hasIconBlock,
 	clientId,
+	text,
 	setAttributes,
 } ) {
 	const iconClientId = useSelect(
 		( select ) => getInnerIconClientId( select, clientId ),
 		[ clientId ]
 	);
+	const isIconOnly = hasIcon && iconPosition === ICON_POSITION_ONLY;
 
 	return (
 		<>
@@ -105,7 +113,22 @@ export default function ButtonIconControls( {
 										'blockparty-button-icon'
 									) }
 								/>
+								<ToggleGroupControlOption
+									value={ ICON_POSITION_ONLY }
+									label={ __(
+										'Icon only',
+										'blockparty-button-icon'
+									) }
+								/>
 							</ToggleGroupControl>
+							{ isIconOnly && (
+								<IconOnlyLabelControl
+									text={ text }
+									onChange={ ( value ) => {
+										setAttributes( { text: value } );
+									} }
+								/>
+							) }
 							<Button
 								variant="secondary"
 								__next40pxDefaultSize
