@@ -280,7 +280,7 @@ export default function ButtonIconEdit( props ) {
 					placement="bottom"
 					onClose={ () => {
 						setIsEditingURL( false );
-						richTextRef.current?.focus();
+						( richTextRef.current ?? popoverAnchor )?.focus();
 					} }
 					anchor={ popoverAnchor }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
@@ -310,7 +310,7 @@ export default function ButtonIconEdit( props ) {
 								rel: undefined,
 							} );
 							setIsEditingURL( false );
-							richTextRef.current?.focus();
+							( richTextRef.current ?? popoverAnchor )?.focus();
 						} }
 						forceIsEditingLink={ ! isURLSet }
 						settings={ LINK_SETTINGS }

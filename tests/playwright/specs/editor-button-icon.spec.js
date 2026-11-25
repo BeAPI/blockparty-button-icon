@@ -67,6 +67,17 @@ test.describe( 'Blockparty Button Icon editor', () => {
 			canvas.locator( '.wp-block-button .wp-block-icon' ).first()
 		).toBeVisible( { timeout: 10_000 } );
 
+		await canvas
+			.locator( '.wp-block-button .wp-block-icon' )
+			.first()
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			page
+				.locator( '.blockparty-button-icon-notice' )
+				.getByText( 'Inside a button, this icon is decorative' )
+		).toBeVisible();
+
 		await editor.saveDraft();
 		await expect(
 			page.getByRole( 'button', { name: 'Saved' } )
@@ -138,7 +149,10 @@ test.describe( 'Blockparty Button Icon editor', () => {
 
 		// Clicking the nested icon must keep core/button selected so the Icon
 		// panel (and required screen-reader label) stay available.
-		await canvas.locator( '.wp-block-button .wp-block-icon' ).first().click();
+		await canvas
+			.locator( '.wp-block-button .wp-block-icon' )
+			.first()
+			.click();
 		await expect( labelField ).toBeVisible();
 		await expect(
 			page.getByRole( 'button', { name: 'Replace Icon', exact: true } )
@@ -198,5 +212,63 @@ test.describe( 'Blockparty Button Icon editor', () => {
 		} );
 
 		expect( invalidCount ).toBe( 0 );
+	} );
+
+	test( 'switches left, icon only and right across a reload without invalid blocks', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await insertButtonBlock( editor );
+
+		const canvas = await getEditorCanvas( page );
+		const button = canvas.locator( '.wp-block-button' ).first();
+		await expect( button ).toBeVisible( { timeout: 10_000 } );
+		await button.click();
+
+		await page.getByLabel( 'Icon', { exact: true } ).click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'radio', { name: 'Icon only' } ).click();
+		await expect( button ).toHaveClass( /blockparty-button-icon--only/ );
+
+		const postId = await editor.publishPost();
+		await admin.editPost( postId );
+
+		const countInvalid = () =>
+			page.evaluate( () => {
+				const { select } = window.wp.data;
+				const walk = ( blocks ) =>
+					blocks.reduce(
+						( count, block ) =>
+							count +
+							( block.isValid ? 0 : 1 ) +
+							walk( block.innerBlocks ),
+						0
+					);
+				return walk( select( 'core/block-editor' ).getBlocks() );
+			} );
+
+		await expect
+			.poll( async () => ( await editor.getBlocks() ).length )
+			.toBeGreaterThan( 0 );
+		expect( await countInvalid() ).toBe( 0 );
+
+		const reloadedCanvas = await getEditorCanvas( page );
+		const reloadedButton = reloadedCanvas
+			.locator( '.wp-block-button' )
+			.first();
+		await expect( reloadedButton ).toHaveClass(
+			/blockparty-button-icon--only/
+		);
+		await editor.selectBlocks( reloadedButton );
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'radio', { name: 'Right' } ).click();
+		await expect( reloadedButton ).toHaveClass(
+			/blockparty-button-icon--right/
+		);
+		await expect(
+			reloadedButton.locator( '.wp-block-button__label' )
+		).toHaveText( 'Click me' );
+		expect( await countInvalid() ).toBe( 0 );
 	} );
 } );

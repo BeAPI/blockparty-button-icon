@@ -44,6 +44,7 @@ composer require beapi/blockparty-button-icon
 3. Turn on **Show icon**
 4. Choose **Left**, **Right** or **Icon only** for icon position
    - With **Icon only**, the label is hidden in the canvas and on the front end; fill the required **Label (screen readers)** field in the sidebar
+   - This field is plain text: editing it removes any formatting from the label (bold, italic, `<span lang>`). Switching back to **Left** or **Right** keeps the plain text
 5. Use the block toolbar **Icon** control to pick or replace the icon
 6. Adjust **Block spacing → Block gap** (horizontal) to change the space between icon and label
 
@@ -68,7 +69,7 @@ The first block type in the filtered list is used when the editor creates a new 
 
 - Button label text is wrapped in `<span class="wp-block-button__label">` when an icon is present, keeping a clear text node for assistive technologies
 - On the front end, `core/icon` outer wrappers are output as `span` elements when rendered inside button links
-- Icons inside buttons get `aria-hidden="true"`: the text label always provides the accessible name
+- Icons inside buttons get `aria-hidden="true"` when the button label has text: the label then provides the accessible name. When the label is empty (for example a v1.0.0 icon-only button relying on the icon alternative text), the icon is left exposed so the button keeps a name
 - **Icon only** buttons keep the label in the markup and hide it visually (`.blockparty-button-icon--only .wp-block-button__label`), so links and buttons keep an accessible name
 
 ## Generated markup example

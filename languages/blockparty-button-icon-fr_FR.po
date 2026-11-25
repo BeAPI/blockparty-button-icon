@@ -90,3 +90,7 @@ msgstr "Obligatoire. Masqué à l’écran, annoncé par les technologies d’as
 #: build/index.js:1
 msgid "A label is required for an icon-only button to be accessible."
 msgstr "Un libellé est obligatoire pour qu’un bouton icône seule soit accessible."
+
+#: build/index.js:1
+msgid "Inside a button, this icon is decorative: the button label is its accessible name. The icon alternative text is only used when the button label is empty."
+msgstr "Dans un bouton, cette icône est décorative : le libellé du bouton sert de nom accessible. Le texte alternatif de l’icône n’est utilisé que si le libellé du bouton est vide."

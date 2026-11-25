@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-18T18:31:44+00:00\n"
+"POT-Creation-Date: 2026-11-25T17:40:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: blockparty-button-icon\n"
@@ -92,4 +92,8 @@ msgstr ""
 
 #: build/index.js:1
 msgid "Link"
+msgstr ""
+
+#: build/index.js:1
+msgid "Inside a button, this icon is decorative: the button label is its accessible name. The icon alternative text is only used when the button label is empty."
 msgstr ""
