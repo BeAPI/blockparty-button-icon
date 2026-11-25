@@ -11,7 +11,8 @@ import {
 	__experimentalGetElementClassName,
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
-import { BUTTON_LABEL_CLASS_NAME, ICON_POSITION_RIGHT } from './constants';
+import { BUTTON_LABEL_CLASS_NAME } from './constants';
+import { getButtonIconClassNames } from './get-button-icon-class-names';
 import { getButtonIconGapStyle } from './get-button-icon-gap-style';
 import { normalizeButtonLabelText } from './normalize-button-label-text';
 
@@ -66,13 +67,7 @@ export default function buttonIconSave( { attributes } ) {
 	};
 
 	const wrapperProps = useBlockProps.save( {
-		className: clsx( {
-			'blockparty-button-icon': hasIcon,
-			'blockparty-button-icon--left':
-				hasIcon && iconPosition !== ICON_POSITION_RIGHT,
-			'blockparty-button-icon--right':
-				hasIcon && iconPosition === ICON_POSITION_RIGHT,
-		} ),
+		className: clsx( getButtonIconClassNames( hasIcon, iconPosition ) ),
 	} );
 
 	const linkProps = {

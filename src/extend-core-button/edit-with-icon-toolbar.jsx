@@ -12,7 +12,7 @@ import { getRegisteredIconBlocks } from './get-registered-icon-blocks';
  */
 export default function EditWithIconToolbar( props, OriginalEdit ) {
 	const { attributes, setAttributes, clientId } = props;
-	const { hasIcon, iconPosition } = attributes;
+	const { hasIcon, iconPosition, text } = attributes;
 	const hasIconBlock = getRegisteredIconBlocks().length > 0;
 
 	return (
@@ -30,6 +30,7 @@ export default function EditWithIconToolbar( props, OriginalEdit ) {
 						iconPosition={ iconPosition }
 						hasIconBlock={ hasIconBlock }
 						clientId={ clientId }
+						text={ text }
 						setAttributes={ setAttributes }
 					/>
 					<OriginalEdit { ...props } />

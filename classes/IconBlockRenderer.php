@@ -8,7 +8,8 @@
 namespace Blockparty\ButtonIcon;
 
 /**
- * Converts core/icon wrappers so markup stays valid inside button links.
+ * Converts core/icon wrappers so markup stays valid inside button links
+ * and marks them as decorative.
  */
 class IconBlockRenderer {
 
@@ -76,11 +77,56 @@ class IconBlockRenderer {
 	 * @return string Unchanged HTML.
 	 */
 	public function leave_button_with_icon_context( string $block_content, array $block ): string {
-		if ( $this->is_button_with_icon( $block ) && $this->button_with_icon_depth > 0 ) {
+		if ( ! $this->is_button_with_icon( $block ) ) {
+			return $block_content;
+		}
+
+		if ( $this->button_with_icon_depth > 0 ) {
 			--$this->button_with_icon_depth;
 		}
 
-		return $block_content;
+		// Without label text, the icon (and its aria-label) is the only accessible
+		// name left: v1.0.0 icon-only buttons relied on it, so keep it exposed.
+		if ( ! self::button_label_has_text( $block_content ) ) {
+			return $block_content;
+		}
+
+		return self::hide_icon_from_assistive_technologies( $block_content );
+	}
+
+	/**
+	 * Whether the button label span contains visible text.
+	 *
+	 * @param string $html Rendered button block HTML.
+	 * @return bool True when `.wp-block-button__label` holds non-whitespace text.
+	 */
+	public static function button_label_has_text( string $html ): bool {
+		$processor = new \WP_HTML_Tag_Processor( $html );
+
+		if ( ! $processor->next_tag( array( 'class_name' => 'wp-block-button__label' ) ) ) {
+			return false;
+		}
+
+		// Track nested spans (e.g. <span lang="en">) to stop at the label closer.
+		$depth = 1;
+		$text  = '';
+
+		while ( $depth > 0 && $processor->next_token() ) {
+			$token = $processor->get_token_name();
+
+			if ( '#text' === $token ) {
+				$text .= $processor->get_modifiable_text();
+				continue;
+			}
+
+			if ( 'SPAN' !== $token ) {
+				continue;
+			}
+
+			$depth += $processor->is_tag_closer() ? -1 : 1;
+		}
+
+		return '' !== trim( (string) preg_replace( '/[\s\x{00A0}]+/u', ' ', $text ) );
 	}
 
 	/**
@@ -103,6 +149,32 @@ class IconBlockRenderer {
 		}
 
 		return self::convert_icon_wrapper_to_span( $block_content );
+	}
+
+	/**
+	 * Marks the icon wrapper as decorative (aria-hidden="true").
+	 *
+	 * Only called when the button label has text: the label then provides the
+	 * accessible name, even when visually hidden (icon only), and an icon
+	 * aria-label would otherwise be announced in addition to it.
+	 *
+	 * @param string $html Rendered icon or button block HTML.
+	 * @return string HTML with aria-hidden on the icon wrapper when applicable.
+	 */
+	public static function hide_icon_from_assistive_technologies( string $html ): string {
+		$processor = new \WP_HTML_Tag_Processor( $html );
+
+		if ( ! $processor->next_tag( array( 'class_name' => 'wp-block-icon' ) ) ) {
+			return $html;
+		}
+
+		if ( 'true' === $processor->get_attribute( 'aria-hidden' ) ) {
+			return $html;
+		}
+
+		$processor->set_attribute( 'aria-hidden', 'true' );
+
+		return $processor->get_updated_html();
 	}
 
 	/**
