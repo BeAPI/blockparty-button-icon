@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'beapi/blockparty-button-icon',
-        'pretty_version' => 'dev-develop',
-        'version' => 'dev-develop',
-        'reference' => 'ad5b6bb00f42c87d5f757b46eecc5b5159628161',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'bae7cb2a49b925593732d25561fe7a184d70744e',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'beapi/blockparty-button-icon' => array(
-            'pretty_version' => 'dev-develop',
-            'version' => 'dev-develop',
-            'reference' => 'ad5b6bb00f42c87d5f757b46eecc5b5159628161',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'bae7cb2a49b925593732d25561fe7a184d70744e',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
