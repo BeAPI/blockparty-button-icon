@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Blockparty Button Icon
  * Description:       Easily add icons to button blocks in WordPress.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 7.0
  * Requires PHP:      8.1
  * Author:            Be API Technical Team
@@ -27,7 +27,7 @@ if ( ! is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-define( 'BLOCKPARTY_BUTTON_ICON_VERSION', '1.0.0' );
+define( 'BLOCKPARTY_BUTTON_ICON_VERSION', '1.1.0' );
 define( 'BLOCKPARTY_BUTTON_ICON_URL', plugin_dir_url( __FILE__ ) );
 define( 'BLOCKPARTY_BUTTON_ICON_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BLOCKPARTY_BUTTON_ICON_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
