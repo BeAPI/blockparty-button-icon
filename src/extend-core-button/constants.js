@@ -5,6 +5,8 @@ export const BUTTON_LABEL_CLASS_NAME = 'wp-block-button__label';
 
 export const ICON_POSITION_LEFT = 'left';
 export const ICON_POSITION_RIGHT = 'right';
+/** Icon only: label is kept for screen readers but visually hidden. */
+export const ICON_POSITION_ONLY = 'only';
 
 export const BUTTON_ICON_ATTRIBUTES = {
 	hasIcon: {

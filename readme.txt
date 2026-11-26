@@ -4,7 +4,7 @@ Tags:              block, button, icon, gutenberg
 Requires at least: 7.0
 Tested up to:      7.0
 Requires PHP:      8.1
-Stable tag:        1.0.0
+Stable tag:        1.1.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,7 +18,7 @@ Blockparty Button Icon enhances the WordPress core Button block (`core/button`) 
 
 * Extends the core Button block (no new block name)
 * Optional icon via inner blocks (defaults to `core/icon`)
-* Icon position: left or right
+* Icon position: left, right or icon only (label kept for screen readers)
 * Horizontal block gap for icon ↔ label spacing
 * Valid HTML inside links (`span` wrapper for icons on the front end)
 * Filter `blockparty_button_icon_allowed_icon_blocks` to allow other icon block types
@@ -36,6 +36,12 @@ Blockparty Button Icon enhances the WordPress core Button block (`core/button`) 
 By default, only `core/icon` is allowed inside the button. Use the `blockparty_button_icon_allowed_icon_blocks` filter to register additional block types.
 
 == Changelog ==
+
+= 1.1.0 =
+* Add an "Icon only" button position: the label is visually hidden but kept for screen readers
+* Keep the icon clickable to replace it in icon-only mode
+* Mark icons inside buttons as decorative when the button label has text
+* Restore keyboard focus on the button after closing the link popover in icon-only mode
 
 = 1.0.0 =
 * Initial release
